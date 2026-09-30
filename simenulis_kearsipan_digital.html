@@ -1,0 +1,964 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Kearsipan Digital Sekolah</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Google Font Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: {
+                            900: '#0a1d37',
+                            800: '#0c2340',
+                            700: '#112d52',
+                            600: '#1a3b66',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6fb;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .active-menu-item {
+            background-color: #ffffff !important;
+            color: #0c2340 !important;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            font-weight: 600;
+        }
+        .active-menu-item i {
+            color: #2563eb !important;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- LOGIN OVERLAY / SCREEN -->
+    <div id="login-screen" class="fixed inset-0 z-50 bg-navy-900 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6">
+            <div class="inline-flex p-3 bg-blue-50 text-blue-600 rounded-2xl mb-1">
+                <i class="ph-bold ph-buildings text-4xl"></i>
+            </div>
+            <div>
+                <h2 class="text-xl font-extrabold text-navy-900 uppercase">Kearsipan Surat Digital</h2>
+                <p class="text-xs text-slate-500 mt-1">Sistem Informasi Pengelolaan Surat Masuk & Keluar Sekolah</p>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Nomor Pokok Sekolah Nasional (NPSN)</label>
+                    <div class="relative">
+                        <i class="ph-bold ph-identification-card absolute left-3.5 top-3 text-slate-400 text-base"></i>
+                        <input type="text" id="login-npsn" required placeholder="Masukkan NPSN Sekolah..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-600 focus:bg-white transition">
+                    </div>
+                    <p class="text-[11px] text-slate-400 mt-1">Gunakan NPSN resmi sekolah: <strong class="text-slate-600">20601631</strong></p>
+                </div>
+
+                <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
+                    <i class="ph-bold ph-sign-in text-base"></i>
+                    <span>Masuk ke System</span>
+                </button>
+            </form>
+
+            <div class="pt-4 border-t border-slate-100 text-[11px] text-slate-400">
+                Direktorat Sekolah Dasar • Kemendikdasmen RI
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" class="flex flex-1 min-h-screen relative overflow-x-hidden hidden">
+        
+        <!-- SIDEBAR -->
+        <aside id="sidebar" class="w-64 bg-navy-800 text-slate-300 flex flex-col justify-between transition-all duration-300 z-30 shrink-0">
+            <div>
+                <!-- Header Logo Brand -->
+                <div class="p-5 flex flex-col items-start gap-2 border-b border-navy-700/50">
+                    <div class="bg-white rounded-lg p-2.5 w-full flex items-center gap-3 shadow-md">
+                        <div class="bg-blue-600 text-white p-2 rounded-md flex items-center justify-center">
+                            <i class="ph-bold ph-buildings text-xl"></i>
+                        </div>
+                        <div>
+                            <h1 class="text-xs font-bold text-navy-900 tracking-tight leading-none uppercase">Kemendikdasmen</h1>
+                            <span class="text-[10px] text-slate-500 font-semibold block mt-0.5">Direktorat SD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Links -->
+                <nav class="p-3 space-y-1 text-sm font-medium">
+                    <button onclick="switchTab('beranda')" id="nav-beranda" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition active-menu-item">
+                        <i class="ph-bold ph-house-line text-lg"></i>
+                        <span>Beranda</span>
+                    </button>
+                    <button onclick="switchTab('surat-masuk')" id="nav-surat-masuk" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
+                        <i class="ph-bold ph-tray-arrow-down text-lg text-slate-400"></i>
+                        <span>Surat Masuk</span>
+                        <span id="badge-masuk-count" class="ml-auto bg-blue-500/20 text-blue-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    </button>
+                    <button onclick="switchTab('surat-keluar')" id="nav-surat-keluar" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
+                        <i class="ph-bold ph-tray-arrow-up text-lg text-slate-400"></i>
+                        <span>Surat Keluar</span>
+                        <span id="badge-keluar-count" class="ml-auto bg-slate-700 text-slate-300 text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                    </button>
+                    <button onclick="switchTab('disposisi')" id="nav-disposisi" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
+                        <i class="ph-bold ph-git-fork text-lg text-slate-400"></i>
+                        <span>Disposisi Surat</span>
+                    </button>
+
+                    <div class="pt-4 pb-1 pl-3 text-[11px] font-bold tracking-wider text-slate-400 uppercase">Master Data & Integrasi</div>
+
+                    <button onclick="switchTab('kategori')" id="nav-kategori" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
+                        <i class="ph-bold ph-folders text-lg text-slate-400"></i>
+                        <span>Klasifikasi Permendagri 83</span>
+                    </button>
+                    <button onclick="switchTab('apps-script')" id="nav-apps-script" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
+                        <i class="ph-bold ph-code text-lg text-slate-400"></i>
+                        <span>Integrasi Code.gs</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Logout Button -->
+            <div class="p-3 border-t border-navy-700/50">
+                <button onclick="handleLogout()" class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-navy-700/60 hover:bg-red-600/80 text-white rounded-lg text-sm font-medium transition duration-200">
+                    <i class="ph-bold ph-sign-out text-base"></i>
+                    <span>Keluar (Logout)</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col min-w-0 bg-[#f4f6fb] overflow-y-auto">
+            
+            <!-- Top Header Bar -->
+            <header class="bg-white border-b border-slate-200/80 px-6 py-3.5 flex items-center justify-between sticky top-0 z-20 shadow-sm">
+                <div class="flex items-center gap-3">
+                    <button onclick="toggleSidebar()" class="text-slate-500 hover:text-navy-800 p-1 rounded-md transition">
+                        <i class="ph-bold ph-caret-double-left text-lg" id="collapse-icon"></i>
+                    </button>
+                    <div class="flex items-center gap-2 text-sm font-semibold text-slate-700">
+                        <span id="page-title">Beranda</span>
+                        <span class="bg-navy-800 text-white text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase">TA 2026</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-right hidden sm:block">
+                        <div class="text-xs font-bold text-slate-800 uppercase">SDN 2 NEGLASARI</div>
+                        <div class="text-[11px] font-medium text-amber-600">SEKOLAH - 20601631</div>
+                    </div>
+                    <div class="w-9 h-9 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm border border-blue-200 shadow-sm">
+                        S
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content Container -->
+            <div class="p-6 max-w-7xl w-full mx-auto space-y-6">
+
+                <!-- TAB 1: BERANDA -->
+                <div id="tab-beranda" class="tab-content space-y-6">
+                    <!-- Top Status Alert Banner -->
+                    <div class="bg-white rounded-2xl p-5 border border-emerald-200/80 shadow-sm relative overflow-hidden">
+                        <div class="flex items-start gap-4">
+                            <div class="w-10 h-10 rounded-full bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-sm">
+                                <i class="ph-bold ph-check text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex items-center gap-2 mb-1 flex-wrap">
+                                    <span class="bg-emerald-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded uppercase tracking-wider">AKTIF</span>
+                                    <span class="text-xs text-slate-500 font-medium">Klasifikasi Standar Permendagri No. 83 Tahun 2022</span>
+                                </div>
+                                <h3 class="text-sm font-bold text-slate-800">Sistem Kearsipan Digital Sekolah Terverifikasi</h3>
+                                <p class="text-xs text-slate-600 mt-1 leading-relaxed">
+                                    Pengelolaan data surat masuk, surat keluar, disposisi, dan eksport rekapan berkas terhubung secara real-time.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Welcome Card Banner -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/70 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                        <div class="flex items-center gap-4">
+                            <div class="w-14 h-14 rounded-2xl bg-blue-600 text-white flex items-center justify-center shadow-md shrink-0">
+                                <i class="ph-bold ph-bank text-3xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-xl font-extrabold text-slate-800 tracking-tight">Selamat Datang, SDN 2 NEGLASARI</h2>
+                                <p class="text-xs text-slate-500 font-medium mt-0.5 flex items-center gap-2">
+                                    <span>NPSN 20601631</span>
+                                    <span>•</span>
+                                    <span>Kecamatan Cibeber</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                            <span class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-2">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                KEARSIPAN AKTIF
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Summary Metrics Grid Cards -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Surat Masuk</span>
+                                <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                                    <i class="ph-bold ph-tray-arrow-down text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="stat-masuk-val" class="text-3xl font-extrabold text-slate-800">0</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Surat Keluar</span>
+                                <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
+                                    <i class="ph-bold ph-tray-arrow-up text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="stat-keluar-val" class="text-3xl font-extrabold text-slate-800">0</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Disposisi Selesai</span>
+                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                                    <i class="ph-bold ph-check-circle text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="stat-disposisi-val" class="text-3xl font-extrabold text-slate-800">0</div>
+                        </div>
+
+                        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-xs font-bold text-slate-500 uppercase">Perlu Disposisi</span>
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                                    <i class="ph-bold ph-clock text-xl"></i>
+                                </div>
+                            </div>
+                            <div id="stat-pending-val" class="text-3xl font-extrabold text-amber-600">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Overview Section -->
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold">
+                                    <i class="ph-bold ph-file-text text-lg"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-base font-bold text-slate-800">Arsip Surat Terakhir</h3>
+                                    <p class="text-xs text-slate-500">Ringkasan dokumen yang baru saja dicatat</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="border-b border-slate-200 bg-slate-50 text-slate-600 font-bold uppercase tracking-wider">
+                                        <th class="p-3">Tipe</th>
+                                        <th class="p-3">Kode Klasifikasi</th>
+                                        <th class="p-3">No. Surat</th>
+                                        <th class="p-3">Pengirim / Tujuan</th>
+                                        <th class="p-3">Perihal</th>
+                                        <th class="p-3">Tanggal</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboard-recent-table" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: SURAT MASUK -->
+                <div id="tab-surat-masuk" class="tab-content hidden space-y-5">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i class="ph-bold ph-tray-arrow-down text-blue-600"></i>
+                                Data Surat Masuk
+                            </h2>
+                            <p class="text-xs text-slate-500">Kelola dan kumpulkan seluruh arsip surat masuk sekolah</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="exportToExcel('masuk')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <i class="ph-bold ph-file-xls text-base"></i>
+                                Unduh Rekapan Excel
+                            </button>
+                            <button onclick="openModal('masuk')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <i class="ph-bold ph-plus-circle text-base"></i>
+                                Tambah Surat Masuk
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex flex-col sm:flex-row items-center gap-3">
+                        <div class="relative flex-1 w-full">
+                            <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-base"></i>
+                            <input type="text" id="search-masuk" onkeyup="filterTable('masuk')" placeholder="Cari nomor surat, pengirim, atau perihal..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-blue-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                                        <th class="p-3.5">Kode Permendagri 83</th>
+                                        <th class="p-3.5">No. Surat</th>
+                                        <th class="p-3.5">Tanggal Masuk</th>
+                                        <th class="p-3.5">Pengirim</th>
+                                        <th class="p-3.5">Perihal</th>
+                                        <th class="p-3.5">Status Disposisi</th>
+                                        <th class="p-3.5 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-surat-masuk-body" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: SURAT KELUAR -->
+                <div id="tab-surat-keluar" class="tab-content hidden space-y-5">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                <i class="ph-bold ph-tray-arrow-up text-purple-600"></i>
+                                Data Surat Keluar
+                            </h2>
+                            <p class="text-xs text-slate-500">Daftar penerbitan surat keluar resmi instansi</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button onclick="exportToExcel('keluar')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <i class="ph-bold ph-file-xls text-base"></i>
+                                Unduh Rekapan Excel
+                            </button>
+                            <button onclick="openModal('keluar')" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <i class="ph-bold ph-plus-circle text-base"></i>
+                                Buat Surat Keluar
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-4 border border-slate-200/80 shadow-sm flex items-center gap-3">
+                        <div class="relative flex-1">
+                            <i class="ph-bold ph-magnifying-glass absolute left-3.5 top-3 text-slate-400 text-base"></i>
+                            <input type="text" id="search-keluar" onkeyup="filterTable('keluar')" placeholder="Cari nomor surat keluar, penerima, atau perihal..." class="w-full pl-10 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-purple-500 transition">
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-xs">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-slate-700 font-bold uppercase tracking-wider">
+                                        <th class="p-3.5">Kode Permendagri 83</th>
+                                        <th class="p-3.5">No. Surat Keluar</th>
+                                        <th class="p-3.5">Tanggal Kirim</th>
+                                        <th class="p-3.5">Tujuan / Penerima</th>
+                                        <th class="p-3.5">Perihal</th>
+                                        <th class="p-3.5">Status</th>
+                                        <th class="p-3.5 text-center">Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-surat-keluar-body" class="divide-y divide-slate-100">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: DISPOSISI SURAT -->
+                <div id="tab-disposisi" class="tab-content hidden space-y-5">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="ph-bold ph-git-fork text-amber-600"></i>
+                            Lembar Disposisi Surat Masuk
+                        </h2>
+                        <p class="text-xs text-slate-500">Tindak lanjut dan arahan Kepala Sekolah/Pimpinan untuk surat masuk</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-5" id="disposisi-cards-container">
+                    </div>
+                </div>
+
+                <!-- TAB 5: KLASIFIKASI PERMENDAGRI NO 83 TAHUN 2022 -->
+                <div id="tab-kategori" class="tab-content hidden space-y-5">
+                    <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
+                        <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                            <i class="ph-bold ph-folders text-blue-600"></i>
+                            Klasifikasi Kode Surat Permendagri No. 83 Tahun 2022
+                        </h2>
+                        <p class="text-xs text-slate-500">Pedoman Kode Klasifikasi Arsip di Lingkungan Kementerian Dalam Negeri dan Pemerintah Daerah</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">Kode: 400.3</span>
+                            <h4 class="font-bold text-sm text-slate-800 mt-2">Pendidikan</h4>
+                            <p class="text-xs text-slate-500 mt-1">Surat kurikulum, evaluasi belajar, kegiatan kesiswaan, kelembagaan sekolah.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                            <span class="text-xs font-bold text-purple-600 bg-purple-50 px-2 py-1 rounded">Kode: 800</span>
+                            <h4 class="font-bold text-sm text-slate-800 mt-2">Kepegawaian / SDM</h4>
+                            <p class="text-xs text-slate-500 mt-1">Surat Penugasan, SK Kepala Sekolah, Kenaikan Pangkat Guru & Staf.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Kode: 900</span>
+                            <h4 class="font-bold text-sm text-slate-800 mt-2">Keuangan & Aset</h4>
+                            <p class="text-xs text-slate-500 mt-1">Dana Bantuan Operasional Sekolah (BOS), SPJ, Pertanggungjawaban Keuangan.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                            <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">Kode: 100</span>
+                            <h4 class="font-bold text-sm text-slate-800 mt-2">Pemerintahan & Organisasi</h4>
+                            <p class="text-xs text-slate-500 mt-1">Kerjasama antar instansi, rapat dinas umum, instruksi kedinasan.</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-xs">
+                            <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">Kode: 000</span>
+                            <h4 class="font-bold text-sm text-slate-800 mt-2">Umum & Perlengkapan</h4>
+                            <p class="text-xs text-slate-500 mt-1">Surat permohonan pemakaian gedung, sarana prasana, persuratan umum.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 6: APPS SCRIPT CODE -->
+                <div id="tab-apps-script" class="tab-content hidden space-y-5">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="ph-bold ph-code text-emerald-600"></i>
+                                    Integrasi Backend Google Apps Script (Code.gs)
+                                </h2>
+                                <p class="text-xs text-slate-500">Tempelkan kode ini di Google Sheets Anda</p>
+                            </div>
+                            <button onclick="copyCodeGS()" class="px-3.5 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition flex items-center gap-1.5">
+                                <i class="ph-bold ph-copy"></i> Copy Code.gs
+                            </button>
+                        </div>
+
+                        <div class="relative bg-slate-900 text-slate-100 rounded-xl p-4 text-xs font-mono overflow-x-auto max-h-96">
+                            <pre id="apps-script-code">
+/* 
+ * BACKEND GOOGLE APPS SCRIPT (Code.gs)
+ * Permendagri No. 83 Tahun 2022
+ */
+
+function doGet() {
+  return HtmlService.createTemplateFromFile('index')
+    .evaluate()
+    .setTitle('Kearsipan Digital Sekolah')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function simpanSuratMasuk(formObject) {
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("SuratMasuk");
+  if(!sheet) {
+    sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("SuratMasuk");
+    sheet.appendRow(["KodeKlasifikasi", "NoSurat", "Tanggal", "Pengirim", "Perihal", "Status"]);
+  }
+  sheet.appendRow([
+    formObject.kodeKlasifikasi,
+    formObject.noSurat,
+    formObject.tanggal,
+    formObject.pengirim,
+    formObject.perihal,
+    "Belum Disposisi"
+  ]);
+  return { success: true };
+}</pre>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- MODAL ADD SURAT -->
+    <div id="modal-form" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
+            <div class="p-5 bg-navy-800 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i id="modal-icon" class="ph-bold ph-tray-arrow-down text-xl text-blue-400"></i>
+                    <h3 id="modal-title" class="font-bold text-sm">Tambah Surat Masuk Baru</h3>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg"><i class="ph-bold ph-x"></i></button>
+            </div>
+
+            <form id="form-surat" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4 text-xs">
+                <input type="hidden" id="form-type" value="masuk">
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Kode Klasifikasi (Permendagri 83/2022) *</label>
+                    <select id="input-kode" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-semibold">
+                        <option value="400.3 Pendidikan">400.3 - Pendidikan & Kesiswaan</option>
+                        <option value="800 Kepegawaian">800 - Kepegawaian / SDM</option>
+                        <option value="900 Keuangan">900 - Keuangan & Dana BOS</option>
+                        <option value="100 Pemerintahan">100 - Pemerintahan & Kedinasan</option>
+                        <option value="000 Umum">000 - Umum & Sarana Prasarana</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Nomor Surat Resmi *</label>
+                    <input type="text" id="input-no-surat" required placeholder="Contoh: 400.3/045/Disdik/2026" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-bold text-slate-700 mb-1">Tanggal Surat *</label>
+                        <input type="date" id="input-tanggal" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label id="lbl-pihak" class="block font-bold text-slate-700 mb-1">Pengirim *</label>
+                        <input type="text" id="input-pihak" required placeholder="Nama instansi/pihak" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Perihal / Subjek *</label>
+                    <input type="text" id="input-perihal" required placeholder="Uraian ringkas isi surat" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
+                </div>
+
+                <div class="pt-3 flex items-center justify-end gap-2">
+                    <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition">Batal</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition">Simpan Arsip</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DISPOSISI FORM -->
+    <div id="modal-disposisi" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-100">
+            <div class="p-5 bg-amber-600 text-white flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <i class="ph-bold ph-git-fork text-xl"></i>
+                    <h3 class="font-bold text-sm">Disposisi Kepala Sekolah</h3>
+                </div>
+                <button onclick="closeDisposisiModal()" class="text-amber-200 hover:text-white text-lg"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <div class="p-5 space-y-4 text-xs">
+                <div>
+                    <span class="text-slate-400 font-medium block">Nomor Surat:</span>
+                    <span id="disp-target-nosurat" class="font-bold text-slate-800 text-sm"></span>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-700 mb-1">Instruksi Disposisi *</label>
+                    <textarea id="disp-catatan" rows="3" placeholder="Tuliskan petunjuk / tindak lanjut..." class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-amber-500"></textarea>
+                </div>
+                <div class="pt-2 flex justify-end gap-2">
+                    <button onclick="closeDisposisiModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-bold">Batal</button>
+                    <button onclick="submitDisposisi()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold">Simpan Disposisi</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast-notif" class="fixed top-5 right-5 z-50 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none transform translate-y-[-10px]">
+        <div id="toast-icon-wrapper" class="w-7 h-7 rounded-full bg-emerald-500 flex items-center justify-center text-white shrink-0">
+            <i class="ph-bold ph-check text-sm"></i>
+        </div>
+        <div>
+            <h5 id="toast-title" class="text-xs font-bold">Notifikasi</h5>
+            <p id="toast-msg" class="text-[11px] text-slate-300"></p>
+        </div>
+    </div>
+
+    <script>
+        const REQUIRED_NPSN = "20601631";
+
+        let dataSuratMasuk = [
+            { id: 1, kode: "400.3 Pendidikan", noSurat: "400.3/045/DISDIK/2026", tanggal: "2026-09-25", pengirim: "Dinas Pendidikan Kab/Kota", perihal: "Undangan Sosialisasi Kurikulum Digital", status: "Selesai Disposisi", catatanDisp: "Guru kelas Wajib Hadir" },
+            { id: 2, kode: "900 Keuangan", noSurat: "900/112/KORWIL/2026", tanggal: "2026-09-28", pengirim: "Korwil Bidang Pendidikan", perihal: "Verifikasi SPJ Dana BOS Tahap II", status: "Menunggu Disposisi", catatanDisp: "" }
+        ];
+
+        let dataSuratKeluar = [
+            { id: 1, kode: "400.3 Pendidikan", noSurat: "400.3/088/SDN2/2026", tanggal: "2026-09-26", tujuan: "Orang Tua / Wali Murid", perihal: "Edaran Rapat Komite Sekolah", status: "Terkirim" },
+            { id: 2, kode: "800 Kepegawaian", noSurat: "800/091/SDN2/2026", tanggal: "2026-09-21", tujuan: "Guru Kelas VI", perihal: "Surat Tugas Bimtek Kearsipan", status: "Terkirim" }
+        ];
+
+        let activeDisposisiIndex = null;
+
+        // AUTH / LOGIN SYSTEM
+        function handleLogin(e) {
+            e.preventDefault();
+            const inputNpsn = document.getElementById('login-npsn').value.trim();
+            if(inputNpsn === REQUIRED_NPSN) {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('app-wrapper').classList.remove('hidden');
+                showNotification('Login Berhasil', 'Selamat datang di Kearsipan Digital SDN 2 Neglasari.');
+                renderAll();
+            } else {
+                alert('NPSN Salah! Gunakan NPSN Sekolah yang valid: 20601631');
+            }
+        }
+
+        function handleLogout() {
+            document.getElementById('app-wrapper').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('login-npsn').value = '';
+        }
+
+        // TABS NAVIGATION
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            const target = document.getElementById(`tab-${tabId}`);
+            if(target) target.classList.remove('hidden');
+
+            document.querySelectorAll('aside nav button').forEach(btn => btn.classList.remove('active-menu-item'));
+            const navBtn = document.getElementById(`nav-${tabId}`);
+            if(navBtn) navBtn.classList.add('active-menu-item');
+
+            const pageTitleEl = document.getElementById('page-title');
+            const titles = {
+                'beranda': 'Beranda',
+                'surat-masuk': 'Surat Masuk',
+                'surat-keluar': 'Surat Keluar',
+                'disposisi': 'Disposisi Surat',
+                'kategori': 'Permendagri No. 83 Th 2022',
+                'apps-script': 'Integrasi Code.gs'
+            };
+            if(pageTitleEl) pageTitleEl.innerText = titles[tabId] || 'Beranda';
+        }
+
+        // EXCEL EXPORT FUNCTION (CSV/Excel Download)
+        function exportToExcel(type) {
+            let data = type === 'masuk' ? dataSuratMasuk : dataSuratKeluar;
+            let csvContent = "data:text/csv;charset=utf-8,";
+            
+            if (type === 'masuk') {
+                csvContent += "Kode Klasifikasi,Nomor Surat,Tanggal Masuk,Pengirim,Perihal,Status Disposisi,Catatan Disposisi\n";
+                data.forEach(item => {
+                    csvContent += `"${item.kode}","${item.noSurat}","${item.tanggal}","${item.pengirim}","${item.perihal}","${item.status}","${item.catatanDisp || ''}"\n`;
+                });
+            } else {
+                csvContent += "Kode Klasifikasi,Nomor Surat Keluar,Tanggal Kirim,Tujuan,Perihal,Status\n";
+                data.forEach(item => {
+                    csvContent += `"${item.kode}","${item.noSurat}","${item.tanggal}","${item.tujuan}","${item.perihal}","${item.status}"\n`;
+                });
+            }
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `Rekap_Surat_${type.toUpperCase()}_SDN2_NEGLASARI.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            showNotification('Unduh Berhasil', `File Rekapan Excel Surat ${type} berhasil diunduh.`);
+        }
+
+        // RENDER DATA
+        function renderAll() {
+            renderDashboardRecent();
+            renderSuratMasuk();
+            renderSuratKeluar();
+            renderDisposisi();
+            updateCounts();
+        }
+
+        function updateCounts() {
+            document.getElementById('stat-masuk-val').innerText = dataSuratMasuk.length;
+            document.getElementById('stat-keluar-val').innerText = dataSuratKeluar.length;
+            
+            const pendingDisp = dataSuratMasuk.filter(s => s.status === 'Menunggu Disposisi').length;
+            const completedDisp = dataSuratMasuk.filter(s => s.status === 'Selesai Disposisi').length;
+
+            document.getElementById('stat-pending-val').innerText = pendingDisp;
+            document.getElementById('stat-disposisi-val').innerText = completedDisp;
+
+            document.getElementById('badge-masuk-count').innerText = dataSuratMasuk.length;
+            document.getElementById('badge-keluar-count').innerText = dataSuratKeluar.length;
+        }
+
+        function renderDashboardRecent() {
+            const tbody = document.getElementById('dashboard-recent-table');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            const recentMasuk = dataSuratMasuk.slice(0, 3).map(i => ({...i, type: 'Masuk'}));
+            const recentKeluar = dataSuratKeluar.slice(0, 2).map(i => ({...i, type: 'Keluar', pengirim: i.tujuan}));
+
+            [...recentMasuk, ...recentKeluar].forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+
+                const isMasuk = item.type === 'Masuk';
+                const typeBadge = isMasuk 
+                    ? `<span class="bg-blue-100 text-blue-700 font-bold text-[10px] px-2 py-0.5 rounded">MASUK</span>`
+                    : `<span class="bg-purple-100 text-purple-700 font-bold text-[10px] px-2 py-0.5 rounded">KELUAR</span>`;
+
+                tr.innerHTML = `
+                    <td class="p-3">${typeBadge}</td>
+                    <td class="p-3 font-semibold text-blue-700">${item.kode}</td>
+                    <td class="p-3 font-bold text-slate-800">${item.noSurat}</td>
+                    <td class="p-3 text-slate-600">${item.pengirim}</td>
+                    <td class="p-3 text-slate-700">${item.perihal}</td>
+                    <td class="p-3 text-slate-500">${item.tanggal}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSuratMasuk() {
+            const tbody = document.getElementById('table-surat-masuk-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            dataSuratMasuk.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+                const statusColor = item.status === 'Selesai Disposisi' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600';
+
+                tr.innerHTML = `
+                    <td class="p-3.5 font-bold text-blue-700">${item.kode}</td>
+                    <td class="p-3.5 font-bold text-slate-800">${item.noSurat}</td>
+                    <td class="p-3.5 text-slate-600">${item.tanggal}</td>
+                    <td class="p-3.5 font-medium text-slate-700">${item.pengirim}</td>
+                    <td class="p-3.5 text-slate-600">${item.perihal}</td>
+                    <td class="p-3.5"><span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${statusColor}">${item.status}</span></td>
+                    <td class="p-3.5 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="openDisposisiModal(${index})" title="Proses Disposisi" class="p-1.5 bg-amber-50 text-amber-600 hover:bg-amber-600 hover:text-white rounded-lg transition">
+                                <i class="ph-bold ph-git-fork text-base"></i>
+                            </button>
+                            <button onclick="deleteSurat('masuk', ${index})" title="Hapus" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition">
+                                <i class="ph-bold ph-trash text-base"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderSuratKeluar() {
+            const tbody = document.getElementById('table-surat-keluar-body');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            dataSuratKeluar.forEach((item, index) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition";
+
+                tr.innerHTML = `
+                    <td class="p-3.5 font-bold text-purple-700">${item.kode}</td>
+                    <td class="p-3.5 font-bold text-slate-800">${item.noSurat}</td>
+                    <td class="p-3.5 text-slate-600">${item.tanggal}</td>
+                    <td class="p-3.5 font-medium text-slate-700">${item.tujuan}</td>
+                    <td class="p-3.5 text-slate-600">${item.perihal}</td>
+                    <td class="p-3.5"><span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600">${item.status}</span></td>
+                    <td class="p-3.5 text-center">
+                        <button onclick="deleteSurat('keluar', ${index})" title="Hapus" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition">
+                            <i class="ph-bold ph-trash text-base"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDisposisi() {
+            const container = document.getElementById('disposisi-cards-container');
+            if(!container) return;
+            container.innerHTML = '';
+
+            dataSuratMasuk.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm space-y-3 flex flex-col justify-between";
+                const isDone = item.status === 'Selesai Disposisi';
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-[10px] font-extrabold px-2 py-0.5 rounded ${isDone ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                                ${item.status}
+                            </span>
+                            <span class="text-xs text-slate-400 font-medium">${item.tanggal}</span>
+                        </div>
+                        <span class="text-[10px] font-bold text-blue-600">${item.kode}</span>
+                        <h4 class="font-bold text-sm text-slate-800 leading-snug">${item.perihal}</h4>
+                        <div class="text-xs text-slate-500 mt-1"><strong>Asal:</strong> ${item.pengirim}</div>
+
+                        ${isDone ? `
+                            <div class="mt-3 p-3 bg-amber-50 border border-amber-200/60 rounded-xl text-xs text-slate-700">
+                                <div class="font-bold text-amber-800 mb-1">Catatan Disposisi:</div>
+                                "${item.catatanDisp}"
+                            </div>
+                        ` : ''}
+                    </div>
+
+                    <div class="pt-3 border-t border-slate-100">
+                        <button onclick="openDisposisiModal(${index})" class="w-full py-2 bg-slate-800 hover:bg-slate-900 text-white font-bold rounded-xl text-xs transition">
+                            ${isDone ? 'Edit Disposisi' : 'Berikan Disposisi'}
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function filterTable(type) {
+            const query = document.getElementById(`search-${type}`).value.toLowerCase();
+            const rows = document.querySelectorAll(`#table-surat-${type}-body tr`);
+
+            rows.forEach(row => {
+                row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
+            });
+        }
+
+        function openModal(type) {
+            document.getElementById('form-type').value = type;
+            const modalTitle = document.getElementById('modal-title');
+            const lblPihak = document.getElementById('lbl-pihak');
+
+            if(type === 'masuk') {
+                modalTitle.innerText = "Tambah Surat Masuk Baru";
+                lblPihak.innerText = "Pengirim *";
+            } else {
+                modalTitle.innerText = "Buat Surat Keluar Baru";
+                lblPihak.innerText = "Tujuan / Penerima *";
+            }
+
+            document.getElementById('form-surat').reset();
+            document.getElementById('modal-form').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-form').classList.add('hidden');
+        }
+
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            const type = document.getElementById('form-type').value;
+            const kode = document.getElementById('input-kode').value;
+            const noSurat = document.getElementById('input-no-surat').value;
+            const tanggal = document.getElementById('input-tanggal').value;
+            const pihak = document.getElementById('input-pihak').value;
+            const perihal = document.getElementById('input-perihal').value;
+
+            if(type === 'masuk') {
+                dataSuratMasuk.unshift({
+                    id: Date.now(),
+                    kode: kode,
+                    noSurat: noSurat,
+                    tanggal: tanggal,
+                    pengirim: pihak,
+                    perihal: perihal,
+                    status: 'Menunggu Disposisi',
+                    catatanDisp: ''
+                });
+            } else {
+                dataSuratKeluar.unshift({
+                    id: Date.now(),
+                    kode: kode,
+                    noSurat: noSurat,
+                    tanggal: tanggal,
+                    tujuan: pihak,
+                    perihal: perihal,
+                    status: 'Terkirim'
+                });
+            }
+
+            closeModal();
+            renderAll();
+            showNotification('Disimpan', 'Data arsip surat berhasil diperbarui.');
+        }
+
+        function openDisposisiModal(index) {
+            activeDisposisiIndex = index;
+            const item = dataSuratMasuk[index];
+            document.getElementById('disp-target-nosurat').innerText = item.noSurat;
+            document.getElementById('disp-catatan').value = item.catatanDisp || '';
+            document.getElementById('modal-disposisi').classList.remove('hidden');
+        }
+
+        function closeDisposisiModal() {
+            document.getElementById('modal-disposisi').classList.add('hidden');
+            activeDisposisiIndex = null;
+        }
+
+        function submitDisposisi() {
+            if(activeDisposisiIndex === null) return;
+            const catatan = document.getElementById('disp-catatan').value;
+            dataSuratMasuk[activeDisposisiIndex].status = 'Selesai Disposisi';
+            dataSuratMasuk[activeDisposisiIndex].catatanDisp = catatan;
+
+            closeDisposisiModal();
+            renderAll();
+            showNotification('Disposisi Disimpan', 'Instruksi Kepala Sekolah berhasil dicatat.');
+        }
+
+        function deleteSurat(type, index) {
+            if(type === 'masuk') dataSuratMasuk.splice(index, 1);
+            else dataSuratKeluar.splice(index, 1);
+            renderAll();
+            showNotification('Terhapus', 'Arsip surat berhasil dihapus.');
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('-ml-64');
+            document.getElementById('collapse-icon').classList.toggle('rotate-180');
+        }
+
+        function copyCodeGS() {
+            const codeText = document.getElementById('apps-script-code').innerText;
+            navigator.clipboard.writeText(codeText);
+            showNotification('Disalin!', 'Kode Apps Script telah disalin ke clipboard.');
+        }
+
+        function showNotification(title, msg) {
+            const toast = document.getElementById('toast-notif');
+            document.getElementById('toast-title').innerText = title;
+            document.getElementById('toast-msg').innerText = msg;
+
+            toast.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-[-10px]');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'pointer-events-none', 'translate-y-[-10px]');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
