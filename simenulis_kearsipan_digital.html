@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistem Kearsipan Digital Sekolah</title>
+    <title>Sistem Kearsipan Digital - SDN 2 NEGLASARI</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Phosphor Icons -->
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- SheetJS CDN for Real Excel (.xlsx) Download -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <!-- Google Font Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
@@ -17,9 +19,9 @@
                     colors: {
                         navy: {
                             900: '#0a1d37',
-                            800: '#0c2340',
-                            700: '#112d52',
-                            600: '#1a3b66',
+                            800: '#002b66',
+                            700: '#0d3875',
+                            600: '#1a4b8c',
                         }
                     },
                     fontFamily: {
@@ -47,9 +49,9 @@
         }
         .active-menu-item {
             background-color: #ffffff !important;
-            color: #0c2340 !important;
+            color: #002b66 !important;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            font-weight: 600;
+            font-weight: 700;
         }
         .active-menu-item i {
             color: #2563eb !important;
@@ -59,14 +61,14 @@
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- LOGIN OVERLAY / SCREEN -->
-    <div id="login-screen" class="fixed inset-0 z-50 bg-navy-900 flex items-center justify-center p-4">
+    <div id="login-screen" class="fixed inset-0 z-50 bg-navy-800 flex items-center justify-center p-4">
         <div class="bg-white rounded-2xl max-w-md w-full p-8 shadow-2xl border border-slate-100 text-center space-y-6">
             <div class="inline-flex p-3 bg-blue-50 text-blue-600 rounded-2xl mb-1">
                 <i class="ph-bold ph-buildings text-4xl"></i>
             </div>
             <div>
-                <h2 class="text-xl font-extrabold text-navy-900 uppercase">Kearsipan Surat Digital</h2>
-                <p class="text-xs text-slate-500 mt-1">Sistem Informasi Pengelolaan Surat Masuk & Keluar Sekolah</p>
+                <h2 class="text-xl font-extrabold text-navy-800 uppercase tracking-tight">Kearsipan Surat Digital</h2>
+                <p class="text-xs text-slate-500 mt-1">Sistem Informasi Surat Masuk & Keluar SDN 2 NEGLASARI</p>
             </div>
 
             <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
@@ -81,7 +83,7 @@
 
                 <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
                     <i class="ph-bold ph-sign-in text-base"></i>
-                    <span>Masuk ke System</span>
+                    <span>Masuk ke Sistem Kearsipan</span>
                 </button>
             </form>
 
@@ -104,7 +106,7 @@
                             <i class="ph-bold ph-buildings text-xl"></i>
                         </div>
                         <div>
-                            <h1 class="text-xs font-bold text-navy-900 tracking-tight leading-none uppercase">Kemendikdasmen</h1>
+                            <h1 class="text-xs font-bold text-navy-800 tracking-tight leading-none uppercase">Kemendikdasmen</h1>
                             <span class="text-[10px] text-slate-500 font-semibold block mt-0.5">Direktorat SD</span>
                         </div>
                     </div>
@@ -115,6 +117,11 @@
                     <button onclick="switchTab('beranda')" id="nav-beranda" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition active-menu-item">
                         <i class="ph-bold ph-house-line text-lg"></i>
                         <span>Beranda</span>
+                    </button>
+                    <button onclick="switchTab('upload-surat')" id="nav-upload-surat" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 transition font-bold">
+                        <i class="ph-bold ph-cloud-arrow-up text-lg text-amber-400"></i>
+                        <span>Upload File Surat</span>
+                        <span class="ml-auto bg-amber-400 text-slate-900 text-[10px] px-1.5 py-0.5 rounded font-extrabold uppercase">Baru</span>
                     </button>
                     <button onclick="switchTab('surat-masuk')" id="nav-surat-masuk" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
                         <i class="ph-bold ph-tray-arrow-down text-lg text-slate-400"></i>
@@ -135,11 +142,11 @@
 
                     <button onclick="switchTab('kategori')" id="nav-kategori" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
                         <i class="ph-bold ph-folders text-lg text-slate-400"></i>
-                        <span>Klasifikasi Permendagri 83</span>
+                        <span>Permendagri 83/2022</span>
                     </button>
                     <button onclick="switchTab('apps-script')" id="nav-apps-script" class="w-full text-left flex items-center gap-3 px-3.5 py-2.5 rounded-lg text-slate-300 hover:text-white hover:bg-navy-700 transition">
                         <i class="ph-bold ph-code text-lg text-slate-400"></i>
-                        <span>Integrasi Code.gs</span>
+                        <span>Integrasi Apps Script</span>
                     </button>
                 </nav>
             </div>
@@ -197,7 +204,7 @@
                                 </div>
                                 <h3 class="text-sm font-bold text-slate-800">Sistem Kearsipan Digital Sekolah Terverifikasi</h3>
                                 <p class="text-xs text-slate-600 mt-1 leading-relaxed">
-                                    Pengelolaan data surat masuk, surat keluar, disposisi, dan eksport rekapan berkas terhubung secara real-time.
+                                    Pengelolaan data surat masuk, surat keluar, disposisi, dan upload berkas file terhubung dengan Google Drive & Google Sheets.
                                 </p>
                             </div>
                         </div>
@@ -219,10 +226,10 @@
                             </div>
                         </div>
                         <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                            <span class="bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold px-3 py-2 rounded-xl flex items-center gap-2">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                                KEARSIPAN AKTIF
-                            </span>
+                            <button onclick="switchTab('upload-surat')" class="px-4 py-2.5 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                                <i class="ph-bold ph-cloud-arrow-up text-base"></i>
+                                Upload Dokumen Surat
+                            </button>
                         </div>
                     </div>
 
@@ -260,12 +267,12 @@
 
                         <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-sm">
                             <div class="flex items-center justify-between mb-3">
-                                <span class="text-xs font-bold text-slate-500 uppercase">Perlu Disposisi</span>
+                                <span class="text-xs font-bold text-slate-500 uppercase">Dokumen Terupload</span>
                                 <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                                    <i class="ph-bold ph-clock text-xl"></i>
+                                    <i class="ph-bold ph-file-arrow-up text-xl"></i>
                                 </div>
                             </div>
-                            <div id="stat-pending-val" class="text-3xl font-extrabold text-amber-600">0</div>
+                            <div id="stat-uploaded-val" class="text-3xl font-extrabold text-amber-600">0</div>
                         </div>
                     </div>
 
@@ -273,12 +280,12 @@
                     <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                             <div class="flex items-center gap-3">
-                                <div class="w-9 h-9 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold">
+                                <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold">
                                     <i class="ph-bold ph-file-text text-lg"></i>
                                 </div>
                                 <div>
                                     <h3 class="text-base font-bold text-slate-800">Arsip Surat Terakhir</h3>
-                                    <p class="text-xs text-slate-500">Ringkasan dokumen yang baru saja dicatat</p>
+                                    <p class="text-xs text-slate-500">Ringkasan berkas dan lampiran surat terbaru</p>
                                 </div>
                             </div>
                         </div>
@@ -292,13 +299,100 @@
                                         <th class="p-3">No. Surat</th>
                                         <th class="p-3">Pengirim / Tujuan</th>
                                         <th class="p-3">Perihal</th>
-                                        <th class="p-3">Tanggal</th>
+                                        <th class="p-3">File Upload</th>
                                     </tr>
                                 </thead>
                                 <tbody id="dashboard-recent-table" class="divide-y divide-slate-100">
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+
+                <!-- TAB: MENU UPLOAD SURAT (BARU) -->
+                <div id="tab-upload-surat" class="tab-content hidden space-y-6">
+                    <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                                    <i class="ph-bold ph-cloud-arrow-up text-amber-500 text-2xl"></i>
+                                    Upload Berkas & Lampiran Surat
+                                </h2>
+                                <p class="text-xs text-slate-500">Unggah berkas fisik (PDF / PNG / JPG) langsung ke Google Drive & tautkan ke sistem</p>
+                            </div>
+                        </div>
+
+                        <!-- Form Upload -->
+                        <form onsubmit="handleUploadSubmit(event)" class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Jenis Surat *</label>
+                                    <select id="upload-jenis-surat" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-600">
+                                        <option value="masuk">Surat Masuk</option>
+                                        <option value="keluar">Surat Keluar</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Kode Klasifikasi (Permendagri 83/2022) *</label>
+                                    <select id="upload-kode" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-600">
+                                        <option value="400.3 Pendidikan">400.3 - Pendidikan & Kesiswaan</option>
+                                        <option value="800 Kepegawaian">800 - Kepegawaian / SDM</option>
+                                        <option value="900 Keuangan">900 - Keuangan & Dana BOS</option>
+                                        <option value="100 Pemerintahan">100 - Pemerintahan & Kedinasan</option>
+                                        <option value="000 Umum">000 - Umum & Sarana Prasarana</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Nomor Surat Resmi *</label>
+                                    <input type="text" id="upload-no-surat" required placeholder="Contoh: 400.3/088/SDN2/2026" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-600">
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs font-bold text-slate-700 mb-1">Tanggal Surat *</label>
+                                        <input type="date" id="upload-tanggal" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-600">
+                                    </div>
+                                    <div>
+                                        <label id="lbl-upload-pihak" class="block text-xs font-bold text-slate-700 mb-1">Pengirim / Instansi *</label>
+                                        <input type="text" id="upload-pihak" required placeholder="Nama pengirim / tujuan" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-600">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Perihal / Ringkasan Isi *</label>
+                                    <input type="text" id="upload-perihal" required placeholder="Tuliskan uraian perihal surat" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold focus:outline-none focus:border-blue-600">
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 flex flex-col justify-between">
+                                <div>
+                                    <label class="block text-xs font-bold text-slate-700 mb-1">Pilih File Berkas Surat (PDF / PNG / JPG / DOCX) *</label>
+                                    <div class="border-2 border-dashed border-slate-300 hover:border-blue-500 bg-slate-50/50 rounded-2xl p-6 text-center cursor-pointer transition flex flex-col items-center justify-center min-h-[180px]" onclick="document.getElementById('file-input-element').click()">
+                                        <i class="ph-bold ph-file-arrow-up text-4xl text-blue-600 mb-2"></i>
+                                        <span class="text-xs font-bold text-slate-700" id="file-label-name">Klik untuk memilih file dokumen</span>
+                                        <span class="text-[11px] text-slate-400 mt-1">Maksimal ukuran file: 10MB</span>
+                                        <input type="file" id="file-input-element" onchange="handleFileSelected(event)" accept=".pdf,.png,.jpg,.jpeg,.docx" class="hidden">
+                                    </div>
+                                </div>
+
+                                <div class="bg-blue-50/80 border border-blue-200/80 rounded-xl p-4 text-xs text-blue-900 space-y-1">
+                                    <div class="font-bold flex items-center gap-1.5">
+                                        <i class="ph-bold ph-info"></i>
+                                        Sinkronisasi Google Apps Script:
+                                    </div>
+                                    <p class="text-[11px] leading-relaxed text-slate-600">
+                                        File terisi akan diubah ke bentuk Base64 dan dikirim langsung ke Google Drive folder terdaftar, serta mencatat entri otomatis di Google Sheets.
+                                    </p>
+                                </div>
+
+                                <button type="submit" id="btn-submit-upload" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2">
+                                    <i class="ph-bold ph-cloud-arrow-up text-base"></i>
+                                    <span>Unggah Dokumen Baru</span>
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
 
@@ -315,11 +409,11 @@
                         <div class="flex items-center gap-3">
                             <button onclick="exportToExcel('masuk')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
                                 <i class="ph-bold ph-file-xls text-base"></i>
-                                Unduh Rekapan Excel
+                                Unduh Rekapan Excel (.xlsx)
                             </button>
-                            <button onclick="openModal('masuk')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                            <button onclick="switchTab('upload-surat')" class="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
                                 <i class="ph-bold ph-plus-circle text-base"></i>
-                                Tambah Surat Masuk
+                                Tambah / Upload Surat Masuk
                             </button>
                         </div>
                     </div>
@@ -341,6 +435,7 @@
                                         <th class="p-3.5">Tanggal Masuk</th>
                                         <th class="p-3.5">Pengirim</th>
                                         <th class="p-3.5">Perihal</th>
+                                        <th class="p-3.5">Berkas / File</th>
                                         <th class="p-3.5">Status Disposisi</th>
                                         <th class="p-3.5 text-center">Aksi</th>
                                     </tr>
@@ -365,11 +460,11 @@
                         <div class="flex items-center gap-3">
                             <button onclick="exportToExcel('keluar')" class="px-3.5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
                                 <i class="ph-bold ph-file-xls text-base"></i>
-                                Unduh Rekapan Excel
+                                Unduh Rekapan Excel (.xlsx)
                             </button>
-                            <button onclick="openModal('keluar')" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
+                            <button onclick="switchTab('upload-surat')" class="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition flex items-center gap-2 shadow-sm">
                                 <i class="ph-bold ph-plus-circle text-base"></i>
-                                Buat Surat Keluar
+                                Buat / Upload Surat Keluar
                             </button>
                         </div>
                     </div>
@@ -391,6 +486,7 @@
                                         <th class="p-3.5">Tanggal Kirim</th>
                                         <th class="p-3.5">Tujuan / Penerima</th>
                                         <th class="p-3.5">Perihal</th>
+                                        <th class="p-3.5">Berkas / File</th>
                                         <th class="p-3.5">Status</th>
                                         <th class="p-3.5 text-center">Aksi</th>
                                     </tr>
@@ -458,49 +554,91 @@
                 <!-- TAB 6: APPS SCRIPT CODE -->
                 <div id="tab-apps-script" class="tab-content hidden space-y-5">
                     <div class="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm space-y-4">
-                        <div class="flex items-center justify-between">
+                        <div class="flex items-center justify-between flex-wrap gap-3">
                             <div>
                                 <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
                                     <i class="ph-bold ph-code text-emerald-600"></i>
-                                    Integrasi Backend Google Apps Script (Code.gs)
+                                    Integrasi Apps Script (Code.gs & Google Drive)
                                 </h2>
-                                <p class="text-xs text-slate-500">Tempelkan kode ini di Google Sheets Anda</p>
+                                <p class="text-xs text-slate-500">Salin skrip backend ini untuk menghubungkan form upload langsung ke Google Drive & Sheets SDN 2 NEGLASARI</p>
                             </div>
                             <button onclick="copyCodeGS()" class="px-3.5 py-2 bg-slate-800 text-white rounded-xl text-xs font-bold hover:bg-slate-700 transition flex items-center gap-1.5">
-                                <i class="ph-bold ph-copy"></i> Copy Code.gs
+                                <i class="ph-bold ph-copy"></i> Salin Code.gs
                             </button>
+                        </div>
+
+                        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs text-amber-900 space-y-2">
+                            <div class="font-bold flex items-center gap-1.5">
+                                <i class="ph-bold ph-gear-six text-base"></i> Langkah Singkat Pengaturan Google Drive & Sheets:
+                            </div>
+                            <ol class="list-decimal list-inside space-y-1 text-[11px] text-slate-700">
+                                <li>Buat Folder Baru di Google Drive dengan nama: <strong>Arsip Surat SDN 2 Neglasari</strong>.</li>
+                                <li>Salin ID Folder dari URL (karakter acak setelah <code class="bg-amber-100 px-1 rounded">/folders/YOUR_FOLDER_ID</code>).</li>
+                                <li>Buka Google Sheets baru & gt; menu <strong>Ekstensi &gt; Apps Script</strong>, ganti isi <code class="bg-amber-100 px-1 rounded">Code.gs</code> dengan kode di bawah.</li>
+                                <li>Ganti nilai variabel <code class="bg-amber-100 px-1 rounded">FOLDER_ID</code> dengan ID folder Google Drive Anda.</li>
+                                <li>Klik <strong>Terapkan &gt; Web App Baru</strong> (Set Akses: <em>Siapa Saja / Anyone</em>).</li>
+                            </ol>
                         </div>
 
                         <div class="relative bg-slate-900 text-slate-100 rounded-xl p-4 text-xs font-mono overflow-x-auto max-h-96">
                             <pre id="apps-script-code">
 /* 
  * BACKEND GOOGLE APPS SCRIPT (Code.gs)
- * Permendagri No. 83 Tahun 2022
+ * Kearsipan Digital - SDN 2 NEGLASARI (NPSN 20601631)
  */
 
-function doGet() {
-  return HtmlService.createTemplateFromFile('index')
-    .evaluate()
-    .setTitle('Kearsipan Digital Sekolah')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0')
-    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
-}
+// Ganti FOLDER_ID sesuai ID Folder Google Drive Sekolah Anda
+var FOLDER_ID = "MASUKKAN_GOOGLE_DRIVE_FOLDER_ID_DISINI";
 
-function simpanSuratMasuk(formObject) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("SuratMasuk");
-  if(!sheet) {
-    sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("SuratMasuk");
-    sheet.appendRow(["KodeKlasifikasi", "NoSurat", "Tanggal", "Pengirim", "Perihal", "Status"]);
+function doPost(e) {
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var jenis = data.jenis; // 'masuk' atau 'keluar'
+    var sheetName = (jenis === 'masuk') ? "SuratMasuk" : "SuratKeluar";
+    
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    var sheet = ss.getSheetByName(sheetName);
+    
+    if (!sheet) {
+      sheet = ss.insertSheet(sheetName);
+      if(jenis === 'masuk') {
+        sheet.appendRow(["KodeKlasifikasi", "NoSurat", "Tanggal", "Pengirim", "Perihal", "FileURL", "Status"]);
+      } else {
+        sheet.appendRow(["KodeKlasifikasi", "NoSurat", "Tanggal", "Tujuan", "Perihal", "FileURL", "Status"]);
+      }
+    }
+    
+    var fileUrl = "";
+    if (data.fileBase64 && data.fileName) {
+      var folder = DriveApp.getFolderById(FOLDER_ID);
+      var bytes = Utilities.base64Decode(data.fileBase64.split(',')[1] || data.fileBase64);
+      var blob = Utilities.newBlob(bytes, data.fileMime || 'application/pdf', data.fileName);
+      var file = folder.createFile(blob);
+      file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+      fileUrl = file.getUrl();
+    }
+    
+    sheet.appendRow([
+      data.kode,
+      data.noSurat,
+      data.tanggal,
+      data.pihak,
+      data.perihal,
+      fileUrl,
+      jenis === 'masuk' ? "Menunggu Disposisi" : "Terkirim"
+    ]);
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      result: "success",
+      fileUrl: fileUrl
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (error) {
+    return ContentService.createTextOutput(JSON.stringify({
+      result: "error",
+      message: error.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
   }
-  sheet.appendRow([
-    formObject.kodeKlasifikasi,
-    formObject.noSurat,
-    formObject.tanggal,
-    formObject.pengirim,
-    formObject.perihal,
-    "Belum Disposisi"
-  ]);
-  return { success: true };
 }</pre>
                         </div>
                     </div>
@@ -508,60 +646,6 @@ function simpanSuratMasuk(formObject) {
 
             </div>
         </main>
-    </div>
-
-    <!-- MODAL ADD SURAT -->
-    <div id="modal-form" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 z-50 hidden">
-        <div class="bg-white rounded-2xl max-w-lg w-full shadow-2xl overflow-hidden border border-slate-100">
-            <div class="p-5 bg-navy-800 text-white flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <i id="modal-icon" class="ph-bold ph-tray-arrow-down text-xl text-blue-400"></i>
-                    <h3 id="modal-title" class="font-bold text-sm">Tambah Surat Masuk Baru</h3>
-                </div>
-                <button onclick="closeModal()" class="text-slate-400 hover:text-white text-lg"><i class="ph-bold ph-x"></i></button>
-            </div>
-
-            <form id="form-surat" onsubmit="handleFormSubmit(event)" class="p-6 space-y-4 text-xs">
-                <input type="hidden" id="form-type" value="masuk">
-
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Kode Klasifikasi (Permendagri 83/2022) *</label>
-                    <select id="input-kode" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500 font-semibold">
-                        <option value="400.3 Pendidikan">400.3 - Pendidikan & Kesiswaan</option>
-                        <option value="800 Kepegawaian">800 - Kepegawaian / SDM</option>
-                        <option value="900 Keuangan">900 - Keuangan & Dana BOS</option>
-                        <option value="100 Pemerintahan">100 - Pemerintahan & Kedinasan</option>
-                        <option value="000 Umum">000 - Umum & Sarana Prasarana</option>
-                    </select>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Nomor Surat Resmi *</label>
-                    <input type="text" id="input-no-surat" required placeholder="Contoh: 400.3/045/Disdik/2026" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block font-bold text-slate-700 mb-1">Tanggal Surat *</label>
-                        <input type="date" id="input-tanggal" required class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label id="lbl-pihak" class="block font-bold text-slate-700 mb-1">Pengirim *</label>
-                        <input type="text" id="input-pihak" required placeholder="Nama instansi/pihak" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block font-bold text-slate-700 mb-1">Perihal / Subjek *</label>
-                    <input type="text" id="input-perihal" required placeholder="Uraian ringkas isi surat" class="w-full px-3 py-2 border border-slate-200 rounded-xl focus:outline-none focus:border-blue-500">
-                </div>
-
-                <div class="pt-3 flex items-center justify-end gap-2">
-                    <button type="button" onclick="closeModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition">Batal</button>
-                    <button type="submit" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition">Simpan Arsip</button>
-                </div>
-            </form>
-        </div>
     </div>
 
     <!-- MODAL DISPOSISI FORM -->
@@ -605,14 +689,18 @@ function simpanSuratMasuk(formObject) {
     <script>
         const REQUIRED_NPSN = "20601631";
 
+        let selectedFileBase64 = null;
+        let selectedFileName = "";
+        let selectedFileMime = "";
+
         let dataSuratMasuk = [
-            { id: 1, kode: "400.3 Pendidikan", noSurat: "400.3/045/DISDIK/2026", tanggal: "2026-09-25", pengirim: "Dinas Pendidikan Kab/Kota", perihal: "Undangan Sosialisasi Kurikulum Digital", status: "Selesai Disposisi", catatanDisp: "Guru kelas Wajib Hadir" },
-            { id: 2, kode: "900 Keuangan", noSurat: "900/112/KORWIL/2026", tanggal: "2026-09-28", pengirim: "Korwil Bidang Pendidikan", perihal: "Verifikasi SPJ Dana BOS Tahap II", status: "Menunggu Disposisi", catatanDisp: "" }
+            { id: 1, kode: "400.3 Pendidikan", noSurat: "400.3/045/DISDIK/2026", tanggal: "2026-09-25", pengirim: "Dinas Pendidikan Kab/Kota", perihal: "Undangan Sosialisasi Kurikulum Digital", status: "Selesai Disposisi", catatanDisp: "Guru kelas Wajib Hadir", fileUrl: "#" },
+            { id: 2, kode: "900 Keuangan", noSurat: "900/112/KORWIL/2026", tanggal: "2026-09-28", pengirim: "Korwil Bidang Pendidikan", perihal: "Verifikasi SPJ Dana BOS Tahap II", status: "Menunggu Disposisi", catatanDisp: "", fileUrl: "#" }
         ];
 
         let dataSuratKeluar = [
-            { id: 1, kode: "400.3 Pendidikan", noSurat: "400.3/088/SDN2/2026", tanggal: "2026-09-26", tujuan: "Orang Tua / Wali Murid", perihal: "Edaran Rapat Komite Sekolah", status: "Terkirim" },
-            { id: 2, kode: "800 Kepegawaian", noSurat: "800/091/SDN2/2026", tanggal: "2026-09-21", tujuan: "Guru Kelas VI", perihal: "Surat Tugas Bimtek Kearsipan", status: "Terkirim" }
+            { id: 1, kode: "400.3 Pendidikan", noSurat: "400.3/088/SDN2/2026", tanggal: "2026-09-26", tujuan: "Orang Tua / Wali Murid", perihal: "Edaran Rapat Komite Sekolah", status: "Terkirim", fileUrl: "#" },
+            { id: 2, kode: "800 Kepegawaian", noSurat: "800/091/SDN2/2026", tanggal: "2026-09-21", tujuan: "Guru Kelas VI", perihal: "Surat Tugas Bimtek Kearsipan", status: "Terkirim", fileUrl: "#" }
         ];
 
         let activeDisposisiIndex = null;
@@ -650,41 +738,107 @@ function simpanSuratMasuk(formObject) {
             const pageTitleEl = document.getElementById('page-title');
             const titles = {
                 'beranda': 'Beranda',
+                'upload-surat': 'Upload Berkas Surat',
                 'surat-masuk': 'Surat Masuk',
                 'surat-keluar': 'Surat Keluar',
                 'disposisi': 'Disposisi Surat',
                 'kategori': 'Permendagri No. 83 Th 2022',
-                'apps-script': 'Integrasi Code.gs'
+                'apps-script': 'Integrasi Apps Script'
             };
             if(pageTitleEl) pageTitleEl.innerText = titles[tabId] || 'Beranda';
         }
 
-        // EXCEL EXPORT FUNCTION (CSV/Excel Download)
-        function exportToExcel(type) {
-            let data = type === 'masuk' ? dataSuratMasuk : dataSuratKeluar;
-            let csvContent = "data:text/csv;charset=utf-8,";
-            
-            if (type === 'masuk') {
-                csvContent += "Kode Klasifikasi,Nomor Surat,Tanggal Masuk,Pengirim,Perihal,Status Disposisi,Catatan Disposisi\n";
-                data.forEach(item => {
-                    csvContent += `"${item.kode}","${item.noSurat}","${item.tanggal}","${item.pengirim}","${item.perihal}","${item.status}","${item.catatanDisp || ''}"\n`;
-                });
+        // FILE SELECTION HANDLER
+        function handleFileSelected(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            selectedFileName = file.name;
+            selectedFileMime = file.type;
+            document.getElementById('file-label-name').innerText = file.name;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                selectedFileBase64 = evt.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // SUBMIT UPLOAD FORM
+        function handleUploadSubmit(e) {
+            e.preventDefault();
+
+            const jenis = document.getElementById('upload-jenis-surat').value;
+            const kode = document.getElementById('upload-kode').value;
+            const noSurat = document.getElementById('upload-no-surat').value;
+            const tanggal = document.getElementById('upload-tanggal').value;
+            const pihak = document.getElementById('upload-pihak').value;
+            const perihal = document.getElementById('upload-perihal').value;
+
+            const newDoc = {
+                id: Date.now(),
+                kode: kode,
+                noSurat: noSurat,
+                tanggal: tanggal,
+                perihal: perihal,
+                fileUrl: selectedFileBase64 ? "#" : "#",
+                fileName: selectedFileName || "Dokumen.pdf"
+            };
+
+            if(jenis === 'masuk') {
+                newDoc.pengirim = pihak;
+                newDoc.status = 'Menunggu Disposisi';
+                newDoc.catatanDisp = '';
+                dataSuratMasuk.unshift(newDoc);
             } else {
-                csvContent += "Kode Klasifikasi,Nomor Surat Keluar,Tanggal Kirim,Tujuan,Perihal,Status\n";
-                data.forEach(item => {
-                    csvContent += `"${item.kode}","${item.noSurat}","${item.tanggal}","${item.tujuan}","${item.perihal}","${item.status}"\n`;
-                });
+                newDoc.tujuan = pihak;
+                newDoc.status = 'Terkirim';
+                dataSuratKeluar.unshift(newDoc);
             }
 
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `Rekap_Surat_${type.toUpperCase()}_SDN2_NEGLASARI.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            // Reset Form
+            e.target.reset();
+            selectedFileBase64 = null;
+            selectedFileName = "";
+            document.getElementById('file-label-name').innerText = "Klik untuk memilih file dokumen";
 
-            showNotification('Unduh Berhasil', `File Rekapan Excel Surat ${type} berhasil diunduh.`);
+            renderAll();
+            showNotification('Upload Berhasil', `File berkas surat ${jenis} berhasil ditambahkan.`);
+            switchTab(jenis === 'masuk' ? 'surat-masuk' : 'surat-keluar');
+        }
+
+        // EXCEL EXPORT FUNCTION (SheetJS Implementation)
+        function exportToExcel(type) {
+            let data = type === 'masuk' ? dataSuratMasuk : dataSuratKeluar;
+            let exportData = [];
+
+            if (type === 'masuk') {
+                exportData = data.map(item => ({
+                    "Kode Klasifikasi": item.kode,
+                    "Nomor Surat": item.noSurat,
+                    "Tanggal Masuk": item.tanggal,
+                    "Pengirim": item.pengirim,
+                    "Perihal": item.perihal,
+                    "Status Disposisi": item.status,
+                    "Catatan Disposisi": item.catatanDisp || '-'
+                }));
+            } else {
+                exportData = data.map(item => ({
+                    "Kode Klasifikasi": item.kode,
+                    "Nomor Surat Keluar": item.noSurat,
+                    "Tanggal Kirim": item.tanggal,
+                    "Tujuan": item.tujuan,
+                    "Perihal": item.perihal,
+                    "Status": item.status
+                }));
+            }
+
+            const worksheet = XLSX.utils.json_to_sheet(exportData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, `Surat_${type.toUpperCase()}`);
+
+            XLSX.writeFile(workbook, `Rekap_Surat_${type.toUpperCase()}_SDN2_NEGLASARI.xlsx`);
+            showNotification('Unduh Berhasil', `Rekapan Excel Surat ${type} (.xlsx) telah diunduh.`);
         }
 
         // RENDER DATA
@@ -700,11 +854,9 @@ function simpanSuratMasuk(formObject) {
             document.getElementById('stat-masuk-val').innerText = dataSuratMasuk.length;
             document.getElementById('stat-keluar-val').innerText = dataSuratKeluar.length;
             
-            const pendingDisp = dataSuratMasuk.filter(s => s.status === 'Menunggu Disposisi').length;
             const completedDisp = dataSuratMasuk.filter(s => s.status === 'Selesai Disposisi').length;
-
-            document.getElementById('stat-pending-val').innerText = pendingDisp;
             document.getElementById('stat-disposisi-val').innerText = completedDisp;
+            document.getElementById('stat-uploaded-val').innerText = dataSuratMasuk.length + dataSuratKeluar.length;
 
             document.getElementById('badge-masuk-count').innerText = dataSuratMasuk.length;
             document.getElementById('badge-keluar-count').innerText = dataSuratKeluar.length;
@@ -733,7 +885,11 @@ function simpanSuratMasuk(formObject) {
                     <td class="p-3 font-bold text-slate-800">${item.noSurat}</td>
                     <td class="p-3 text-slate-600">${item.pengirim}</td>
                     <td class="p-3 text-slate-700">${item.perihal}</td>
-                    <td class="p-3 text-slate-500">${item.tanggal}</td>
+                    <td class="p-3 text-slate-500">
+                        <span class="inline-flex items-center gap-1 text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                            <i class="ph-bold ph-file-pdf text-red-500"></i> File Terlampir
+                        </span>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });
@@ -755,6 +911,11 @@ function simpanSuratMasuk(formObject) {
                     <td class="p-3.5 text-slate-600">${item.tanggal}</td>
                     <td class="p-3.5 font-medium text-slate-700">${item.pengirim}</td>
                     <td class="p-3.5 text-slate-600">${item.perihal}</td>
+                    <td class="p-3.5">
+                        <a href="${item.fileUrl}" target="_blank" class="inline-flex items-center gap-1 text-blue-600 font-semibold hover:underline">
+                            <i class="ph-bold ph-file-text"></i> Lihat File
+                        </a>
+                    </td>
                     <td class="p-3.5"><span class="text-[10px] font-bold px-2.5 py-1 rounded-full ${statusColor}">${item.status}</span></td>
                     <td class="p-3.5 text-center">
                         <div class="flex items-center justify-center gap-1.5">
@@ -786,6 +947,11 @@ function simpanSuratMasuk(formObject) {
                     <td class="p-3.5 text-slate-600">${item.tanggal}</td>
                     <td class="p-3.5 font-medium text-slate-700">${item.tujuan}</td>
                     <td class="p-3.5 text-slate-600">${item.perihal}</td>
+                    <td class="p-3.5">
+                        <a href="${item.fileUrl}" target="_blank" class="inline-flex items-center gap-1 text-blue-600 font-semibold hover:underline">
+                            <i class="ph-bold ph-file-text"></i> Lihat File
+                        </a>
+                    </td>
                     <td class="p-3.5"><span class="text-[10px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-600">${item.status}</span></td>
                     <td class="p-3.5 text-center">
                         <button onclick="deleteSurat('keluar', ${index})" title="Hapus" class="p-1.5 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-lg transition">
@@ -844,64 +1010,6 @@ function simpanSuratMasuk(formObject) {
             rows.forEach(row => {
                 row.style.display = row.innerText.toLowerCase().includes(query) ? '' : 'none';
             });
-        }
-
-        function openModal(type) {
-            document.getElementById('form-type').value = type;
-            const modalTitle = document.getElementById('modal-title');
-            const lblPihak = document.getElementById('lbl-pihak');
-
-            if(type === 'masuk') {
-                modalTitle.innerText = "Tambah Surat Masuk Baru";
-                lblPihak.innerText = "Pengirim *";
-            } else {
-                modalTitle.innerText = "Buat Surat Keluar Baru";
-                lblPihak.innerText = "Tujuan / Penerima *";
-            }
-
-            document.getElementById('form-surat').reset();
-            document.getElementById('modal-form').classList.remove('hidden');
-        }
-
-        function closeModal() {
-            document.getElementById('modal-form').classList.add('hidden');
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            const type = document.getElementById('form-type').value;
-            const kode = document.getElementById('input-kode').value;
-            const noSurat = document.getElementById('input-no-surat').value;
-            const tanggal = document.getElementById('input-tanggal').value;
-            const pihak = document.getElementById('input-pihak').value;
-            const perihal = document.getElementById('input-perihal').value;
-
-            if(type === 'masuk') {
-                dataSuratMasuk.unshift({
-                    id: Date.now(),
-                    kode: kode,
-                    noSurat: noSurat,
-                    tanggal: tanggal,
-                    pengirim: pihak,
-                    perihal: perihal,
-                    status: 'Menunggu Disposisi',
-                    catatanDisp: ''
-                });
-            } else {
-                dataSuratKeluar.unshift({
-                    id: Date.now(),
-                    kode: kode,
-                    noSurat: noSurat,
-                    tanggal: tanggal,
-                    tujuan: pihak,
-                    perihal: perihal,
-                    status: 'Terkirim'
-                });
-            }
-
-            closeModal();
-            renderAll();
-            showNotification('Disimpan', 'Data arsip surat berhasil diperbarui.');
         }
 
         function openDisposisiModal(index) {
